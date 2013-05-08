@@ -24,6 +24,15 @@ class MenuButton(urwid.Button):
         urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(self._w, None, 'selected')
         
+class Media(MenuButton):
+    def __init__(self, plugin, item):
+        super(Media, self).__init__(item[0], self.selected_media)
+        self.plugin = plugin
+        self.url = item[1]
+       
+    def selected_media(self, button):
+        print self.plugin.get_media(self.url)
+        
 class Plugin(MenuButton):
     def __init__(self, filename):
         name = os.path.basename(filename)[:-3]
@@ -35,10 +44,10 @@ class Plugin(MenuButton):
         menu_items = []
         
         for item in self.plugin.get_links():
-            menu_items.append(MenuButton(item, None))
+            menu_items.append(Media(self.plugin, item))
         
         if len(columns.contents) > 1:
-            del self.contents[1]
+            del columns.contents[1]
 
         columns.contents.append((Menu(self.plugin.get_name(), menu_items), columns.options('weight', 24)))
         columns.focus_position = 1
