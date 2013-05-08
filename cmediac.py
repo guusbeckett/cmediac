@@ -19,8 +19,9 @@ focus_map = {
 }
 
 class MenuButton(urwid.Button):
-    def __init__(self, text):
+    def __init__(self, text, callback):
         super(MenuButton, self).__init__(text)
+        urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(self._w, None, 'selected')
         
 class Plugin(MenuButton):
@@ -28,12 +29,15 @@ class Plugin(MenuButton):
         name = os.path.basename(filename)[:-3]
         fp, pathname, description = imp.find_module(name, [os.path.dirname(filename)])
         plugin = imp.load_module(name, fp, pathname, description)
-        super(Plugin, self).__init__(plugin.get_name())
+        super(Plugin, self).__init__(plugin.get_name(), None)
 
 class Menu(urwid.WidgetWrap):
     def __init__(self, caption, choices):
         header = urwid.AttrMap(urwid.Text(caption, align='center'), 'heading')
         self._w = urwid.AttrMap(urwid.ListBox(urwid.SimpleFocusListWalker([header, urwid.Divider()] + choices)), 'options', focus_map)
+
+def exit_program(button):
+	raise urwid.ExitMainLoop()
 
 def main():
     columns = urwid.Columns([], dividechars=1)
@@ -43,7 +47,7 @@ def main():
     for filename in glob.glob('plugins/*.py'):
         plugins.append(Plugin(filename))
     
-    columns.contents.append((Menu('cmediac', [MenuButton('Exit')] + plugins), columns.options('given', 24)))
+    columns.contents.append((Menu('cmediac', [MenuButton('Exit', exit_program)] + plugins), columns.options('given', 24)))
 #   columns.contents.append((urwid.AttrMap(Menu('YouTube', [MenuButton('Problems with Zero - Numberphile'), MenuButton('Infite Primes - Numberphile')]), 'options', focus_map),
 #                            columns.options('weight', 24)))
     
