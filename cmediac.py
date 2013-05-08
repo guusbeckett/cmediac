@@ -7,13 +7,11 @@ palette = [
     ('options', 'dark gray', 'black'),
     ('focus heading', 'white', 'dark red'),
     ('focus line', 'black', 'dark red'),
-    ('focus options', 'black', 'light gray'),
     ('selected', 'white', 'dark blue')
 ]
 
 focus_map = {
     'heading': 'focus heading',
-    'options': 'focus options',
     'line': 'focus line'
 }
 
