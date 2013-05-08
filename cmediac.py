@@ -28,8 +28,20 @@ class Plugin(MenuButton):
     def __init__(self, filename):
         name = os.path.basename(filename)[:-3]
         fp, pathname, description = imp.find_module(name, [os.path.dirname(filename)])
-        plugin = imp.load_module(name, fp, pathname, description)
-        super(Plugin, self).__init__(plugin.get_name(), None)
+        self.plugin = imp.load_module(name, fp, pathname, description)
+        super(Plugin, self).__init__(self.plugin.get_name(), self.selected_plugin)
+        
+    def selected_plugin(self, button):
+        menu_items = []
+        
+        for item in self.plugin.get_links():
+            menu_items.append(MenuButton(item, None))
+        
+        if len(columns.contents) > 1:
+            del self.contents[1]
+
+        columns.contents.append((Menu(self.plugin.get_name(), menu_items), columns.options('weight', 24)))
+        columns.focus_position = 1
 
 class Menu(urwid.WidgetWrap):
     def __init__(self, caption, choices):
@@ -37,21 +49,15 @@ class Menu(urwid.WidgetWrap):
         self._w = urwid.AttrMap(urwid.ListBox(urwid.SimpleFocusListWalker([header, urwid.Divider()] + choices)), 'options', focus_map)
 
 def exit_program(button):
-	raise urwid.ExitMainLoop()
+    raise urwid.ExitMainLoop()
 
-def main():
-    columns = urwid.Columns([], dividechars=1)
+columns = urwid.Columns([], dividechars=1)
+
+plugins = []
+
+for filename in glob.glob('plugins/*.py'):
+    plugins.append(Plugin(filename))
     
-    plugins = []
-    
-    for filename in glob.glob('plugins/*.py'):
-        plugins.append(Plugin(filename))
-    
-    columns.contents.append((Menu('cmediac', [MenuButton('Exit', exit_program)] + plugins), columns.options('given', 24)))
-#   columns.contents.append((urwid.AttrMap(Menu('YouTube', [MenuButton('Problems with Zero - Numberphile'), MenuButton('Infite Primes - Numberphile')]), 'options', focus_map),
-#                            columns.options('weight', 24)))
-    
-    urwid.MainLoop(columns, palette).run()
-    
-if __name__ == '__main__':
-    main()
+columns.contents.append((Menu('cmediac', [MenuButton('Exit', exit_program)] + plugins), columns.options('given', 24)))
+
+urwid.MainLoop(columns, palette).run()
