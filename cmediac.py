@@ -2,6 +2,7 @@ import urwid
 import os
 import glob
 import imp
+import webbrowser
 
 palette = [
     (None,  'light gray', 'black'),
@@ -31,7 +32,7 @@ class Media(MenuButton):
         self.url = item[1]
        
     def selected_media(self, button):
-        print self.plugin.get_media(self.url)
+        webbrowser.open(self.plugin.get_media(self.url))
         
 class Plugin(MenuButton):
     def __init__(self, filename):
