@@ -32,7 +32,7 @@ class Media(MenuButton):
         self.url = item[1]
        
     def selected_media(self, button):
-        subprocess.Popen(['mplayer', self.plugin.get_media(self.url)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.Popen(['mplayer', self.plugin.get_media(self.url)])
         
 class Plugin(MenuButton):
     def __init__(self, filename):
