@@ -61,13 +61,8 @@ class Menu(urwid.WidgetWrap):
 def exit_program(button):
     raise urwid.ExitMainLoop()
 
+plugins = [Plugin(filename) for filename in glob.glob('plugins/*.py')]
+
 columns = urwid.Columns([], dividechars=1)
-
-plugins = []
-
-for filename in glob.glob('plugins/*.py'):
-    plugins.append(Plugin(filename))
-    
 columns.contents.append((Menu('cmediac', [MenuButton('Exit', exit_program)] + plugins), columns.options('given', 24)))
-
 urwid.MainLoop(columns, palette).run()
