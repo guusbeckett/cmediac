@@ -12,7 +12,11 @@ def get_links():
         for channel in f:
             feed = urllib.request.urlopen('http://gdata.youtube.com/feeds/api/users/' + channel.strip() + '/uploads') 
             data = feed.read().decode()
-            links.extend(re.findall("<title type='text'>([^<>]+)</title><content type='text'>[^<>]+</content><link rel='alternate' type='text/html' href='([^']+)'/>", data))
+            links.extend(re.findall("<published>([^<>]+)</published><updated>[^<>]+</updated><category [^<>]+/><category [^<>]+/><title type='text'>([^<>]+)</title><content type='text'>[^<>]+</content><link rel='alternate' type='text/html' href='([^']+)'/>", data))
+
+    #links = sorted(links, reverse=True, key=lambda x : datetime.datetime.strptime(x[0], "%Y-%m-%dT%H:%M:%S.000Z"))
+    links = sorted(links, reverse=True, key=lambda x : x[0])
+    links = [(link[1], link[2]) for link in links]
     
     return links 
 
