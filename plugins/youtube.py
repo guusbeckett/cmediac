@@ -10,9 +10,9 @@ def get_links():
     
     with open("youtube-channels.txt") as f:
         for channel in f:
-            feed = urllib.request.urlopen('http://gdata.youtube.com/feeds/api/users/' + channel + '/uploads') 
+            feed = urllib.request.urlopen('http://gdata.youtube.com/feeds/api/users/' + channel.strip() + '/uploads') 
             data = feed.read().decode()
-            links.append(re.findall("<title type='text'>([^<>]+)</title><content type='text'>[^<>]+</content><link rel='alternate' type='text/html' href='([^']+)'/>", data))
+            links.extend(re.findall("<title type='text'>([^<>]+)</title><content type='text'>[^<>]+</content><link rel='alternate' type='text/html' href='([^']+)'/>", data))
     
     return links 
 
