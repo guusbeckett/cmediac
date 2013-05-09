@@ -2,7 +2,7 @@ import urwid
 import os
 import glob
 import imp
-import webbrowser
+import subprocess
 
 palette = [
     (None,  'light gray', 'black'),
@@ -32,7 +32,7 @@ class Media(MenuButton):
         self.url = item[1]
        
     def selected_media(self, button):
-        webbrowser.open(self.plugin.get_media(self.url))
+        subprocess.Popen(['mplayer', self.plugin.get_media(self.url)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
 class Plugin(MenuButton):
     def __init__(self, filename):
