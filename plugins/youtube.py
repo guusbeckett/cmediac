@@ -28,6 +28,6 @@ def get_media(url):
     
     url_data_strs = video_info['url_encoded_fmt_stream_map'][0].split(',')
     url_data = [urllib.parse.parse_qs(uds) for uds in url_data_strs]
-    video = url_data[0] # always pick the first; this might need a little more research
-
-    return video['url'][0] + '&signature=' + video['sig'][0]
+    for video in url_data:
+        if 'webm' not in video['type'][0]:
+            return video['url'][0] + '&signature=' + video['sig'][0]
