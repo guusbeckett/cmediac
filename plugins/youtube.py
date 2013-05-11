@@ -1,4 +1,4 @@
-import re
+import feedparser
 import urllib.parse
 import urllib.request
 
@@ -23,17 +23,8 @@ class Category:
         self.title = title
         
     def get_media(self):
-        with urllib.request.urlopen('http://gdata.youtube.com/feeds/api/users/' + self.title + '/uploads') as feed:
-            data = feed.read().decode()
-            items = re.findall("<published>([^<>]+)</published>" +
-                                    "<updated>[^<>]+</updated>" +
-                                    "<category [^<>]+/>" +
-                                    "<category [^<>]+/>" +
-                                    "<title type='text'>([^<>]+)</title>" +
-                                    "<content type='text'>[^<>]+</content>" +
-                                    "<link rel='alternate' type='text/html' href='([^']+)'/>", data)
-            items = sorted(items, reverse=True, key=lambda x : x[0])
-            return [Media(item[1], item[2]) for item in items]
+        feed = feedparser.parse('http://gdata.youtube.com/feeds/api/users/' + self.title + '/uploads')
+        return [Media(item["title"], item["link"]) for item in feed["items"]]
         
 class Plugin:
     def __init__(self, config):
@@ -41,11 +32,4 @@ class Plugin:
         self.channels = config.get("youtube", "channels").split(',')
         
     def get_categories(self):
-        categories = []
-        
-        with open("youtube-channels.txt") as f:
-            for channel in f:
-                categories.append(Category(channel.strip()))
-                
-        return categories
-
+        return [Category(channel.strip()) for channel in self.channels]
