@@ -38,6 +38,16 @@ class MediaButton(MenuButton):
        
     def selected(self, button):
         subprocess.Popen(['omxplayer', self.media.get_url()])
+
+class CategoryButton(MenuButton):
+    def __init__(self, category):
+        super(CategoryButton, self).__init__(category.title, self.selected)
+        self.category = category
+       
+    def selected(self, button):
+        media_buttons = [MediaButton(media) for media in self.category.get_media()]
+        columns.contents = columns.contents[:2] + [(Menu(self.category.title, media_buttons), columns.options('weight', 24))]
+        columns.focus_position = 2
         
 class PluginButton(MenuButton):
     def __init__(self, plugin):
@@ -45,8 +55,8 @@ class PluginButton(MenuButton):
         super(PluginButton, self).__init__(plugin.name, self.selected)
         
     def selected(self, button):
-        media_buttons = [MediaButton(media) for media in self.plugin.get_media()]
-        columns.contents = columns.contents[0:] + [(Menu(self.plugin.name, media_buttons), columns.options('weight', 24))]
+        category_buttons = [CategoryButton(category) for category in self.plugin.get_categories()]
+        columns.contents = columns.contents[:1] + [(Menu(self.plugin.name, category_buttons), columns.options('given', 20))]
         columns.focus_position = 1
 
 def exit_program(button):
@@ -66,5 +76,5 @@ for filepath in os.listdir('plugins'):
             plugin_buttons.append(PluginButton(plugin))
 
 columns = urwid.Columns([], dividechars=1)
-columns.contents.append((Menu('cmediac', plugin_buttons), columns.options('given', 24)))
+columns.contents.append((Menu('cmediac', plugin_buttons), columns.options('given', 15)))
 urwid.MainLoop(columns, palette).run()
