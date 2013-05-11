@@ -2,7 +2,6 @@
 
 import urwid
 import os
-import glob
 import imp
 import subprocess
 
@@ -27,32 +26,26 @@ class MenuButton(urwid.Button):
         urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(self._w, None, 'selected')
         
-class Media(MenuButton):
-    def __init__(self, plugin, item):
-        super(Media, self).__init__(item[0], self.selected_media)
-        self.plugin = plugin
-        self.url = item[1]
+class MediaButton(MenuButton):
+    def __init__(self, media):
+        super(MediaButton, self).__init__(media.title, self.selected)
+        self.media = media
        
-    def selected_media(self, button):
-        subprocess.Popen(['omxplayer', self.plugin.get_media(self.url)])
+    def selected(self, button):
+        subprocess.Popen(['omxplayer', self.media.get_url()])
         
-class Plugin(MenuButton):
-    def __init__(self, filename):
-        name = os.path.basename(filename)[:-3]
-        fp, pathname, description = imp.find_module(name, [os.path.dirname(filename)])
-        self.plugin = imp.load_module(name, fp, pathname, description)
-        super(Plugin, self).__init__(self.plugin.get_name(), self.selected_plugin)
+class PluginButton(MenuButton):
+    def __init__(self, plugin):
+        self.plugin = plugin
+        super(PluginButton, self).__init__(plugin.name, self.selected)
         
-    def selected_plugin(self, button):
-        menu_items = []
-        
-        for item in self.plugin.get_links():
-            menu_items.append(Media(self.plugin, item))
+    def selected(self, button):
+        media_buttons = [MediaButton(media) for media in self.plugin.get_media()]
         
         if len(columns.contents) > 1:
             del columns.contents[1]
-
-        columns.contents.append((Menu(self.plugin.get_name(), menu_items), columns.options('weight', 24)))
+ 
+        columns.contents.append((Menu(self.plugin.name, media_buttons), columns.options('weight', 24)))
         columns.focus_position = 1
 
 class Menu(urwid.WidgetWrap):
@@ -63,8 +56,19 @@ class Menu(urwid.WidgetWrap):
 def exit_program(button):
     raise urwid.ExitMainLoop()
 
-plugins = [Plugin(filename) for filename in glob.glob('plugins/*.py')]
+plugin_buttons = [MenuButton('Exit', exit_program)]
+
+for filepath in os.listdir('plugins'):
+    filepath = 'plugins/' + filepath
+    modname, extension = os.path.splitext(os.path.split(filepath)[-1])
+    
+    if extension == '.py':
+        module = imp.load_source(modname, filepath)
+        
+        if hasattr(module, 'Plugin'):
+            plugin = module.Plugin()
+            plugin_buttons.append(PluginButton(plugin))
 
 columns = urwid.Columns([], dividechars=1)
-columns.contents.append((Menu('cmediac', [MenuButton('Exit', exit_program)] + plugins), columns.options('given', 24)))
+columns.contents.append((Menu('cmediac', plugin_buttons), columns.options('given', 24)))
 urwid.MainLoop(columns, palette).run()
