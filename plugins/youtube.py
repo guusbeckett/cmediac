@@ -29,7 +29,7 @@ class Category:
 class Plugin:
     def __init__(self, config):
         self.title = 'YouTube'
-        self.channels = config.get("youtube", "channels").split(',')
+        self.channels = config.get('youtube', 'channels', fallback='').split(',')
         
     def get_items(self):
         return [Category(channel) for channel in self.channels]
