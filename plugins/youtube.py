@@ -22,7 +22,7 @@ class Category:
     def __init__(self, title):
         self.title = title
         
-    def get_media(self):
+    def get_items(self):
         feed = feedparser.parse('http://gdata.youtube.com/feeds/api/users/' + self.title + '/uploads')
         return [Media(item["title"], item["link"]) for item in feed["items"]]
         
@@ -31,5 +31,5 @@ class Plugin:
         self.name = 'YouTube'
         self.channels = config.get("youtube", "channels").split(',')
         
-    def get_categories(self):
+    def get_items(self):
         return [Category(channel.strip()) for channel in self.channels]

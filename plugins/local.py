@@ -13,7 +13,7 @@ class Category:
         self.title = title
         self.path = path
         
-    def get_media(self):
+    def get_items(self):
         return [Media(file, self.path + '/' + file) for file in sorted(os.listdir(self.path), reverse=True) if not os.path.isdir(self.path + '/' + file)]
         
 class Plugin:
@@ -21,5 +21,5 @@ class Plugin:
         self.name = 'Local files'
         self.path = config.get("local", "path", fallback="Videos")
         
-    def get_categories(self):
+    def get_items(self):
         return [Category(directory, self.path + '/' + directory) for directory in os.listdir(self.path) if os.path.isdir(self.path + '/' + directory)]

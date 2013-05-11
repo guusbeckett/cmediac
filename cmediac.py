@@ -49,7 +49,7 @@ class CategoryButton(MenuButton):
         self.category = category
        
     def selected(self, button):
-        media_buttons = [MediaButton(media) for media in self.category.get_media()]
+        media_buttons = [MediaButton(media) for media in self.category.get_items()]
         columns.contents = columns.contents[:2] + [(Menu(self.category.title, media_buttons), columns.options('weight', 24))]
         columns.focus_position = 2
         
@@ -59,7 +59,7 @@ class PluginButton(MenuButton):
         super(PluginButton, self).__init__(plugin.name, self.selected)
         
     def selected(self, button):
-        category_buttons = [CategoryButton(category) for category in self.plugin.get_categories()]
+        category_buttons = [CategoryButton(category) for category in self.plugin.get_items()]
         columns.contents = columns.contents[:1] + [(Menu(self.plugin.name, category_buttons), columns.options('given', 20))]
         columns.focus_position = 1
 
