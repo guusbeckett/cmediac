@@ -32,4 +32,4 @@ class Plugin:
         self.channels = config.get("youtube", "channels").split(',')
         
     def get_items(self):
-        return [Category(channel.strip()) for channel in self.channels]
+        return [Category(channel) for channel in self.channels]

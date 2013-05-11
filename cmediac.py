@@ -37,8 +37,8 @@ class Menu(urwid.WidgetWrap):
 
 class ItemButton(MenuButton):
     def __init__(self, item):
-        super(ItemButton, self).__init__(item.title, self.selected)
         self.item = item
+        super(ItemButton, self).__init__(item.title, self.selected)
        
     def selected(self, button):
         if hasattr(self.item, 'get_items'):
