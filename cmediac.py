@@ -22,7 +22,7 @@ focus_map = {
 }
 
 CONFIG_PATH = ".cmediac/config"
-PLUGIN_PATH = "plugins/"
+PLUGIN_PATHS = [".cmediac/plugins", "plugins"]
 
 class MenuButton(urwid.Button):
     def __init__(self, text, callback):
@@ -71,16 +71,17 @@ config.read(CONFIG_PATH)
 
 plugin_buttons = [MenuButton('Exit', exit_program)]
 
-for filepath in os.listdir(PLUGIN_PATH):
-    filepath = PLUGIN_PATH + filepath
-    modname, extension = os.path.splitext(os.path.split(filepath)[-1])
-    
-    if extension == '.py':
-        module = imp.load_source(modname, filepath)
+for path in [path for path in PLUGIN_PATHS if os.path.exists(path)]:
+    for filepath in os.listdir(path):
+        filepath = path + '/' + filepath
+        modname, extension = os.path.splitext(os.path.split(filepath)[-1])
         
-        if hasattr(module, 'Plugin'):
-            plugin = module.Plugin()
-            plugin_buttons.append(PluginButton(plugin))
+        if extension == '.py':
+            module = imp.load_source(modname, filepath)
+            
+            if hasattr(module, 'Plugin'):
+                plugin = module.Plugin()
+                plugin_buttons.append(PluginButton(plugin))
 
 columns = urwid.Columns([], dividechars=1)
 columns.contents.append((Menu('cmediac', plugin_buttons), columns.options('given', 15)))
