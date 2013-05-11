@@ -4,6 +4,7 @@ import urwid
 import os
 import imp
 import subprocess
+import configparser
 
 palette = [
     (None,  'light gray', 'black'),
@@ -19,6 +20,9 @@ focus_map = {
     'heading': 'focus heading',
     'line': 'focus line'
 }
+
+CONFIG_PATH = ".cmediac/config"
+PLUGIN_PATH = "plugins/"
 
 class MenuButton(urwid.Button):
     def __init__(self, text, callback):
@@ -37,7 +41,7 @@ class MediaButton(MenuButton):
         self.media = media
        
     def selected(self, button):
-        subprocess.Popen(['omxplayer', self.media.get_url()])
+        subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.media.get_url()])
 
 class CategoryButton(MenuButton):
     def __init__(self, category):
@@ -62,10 +66,13 @@ class PluginButton(MenuButton):
 def exit_program(button):
     raise urwid.ExitMainLoop()
 
+config = configparser.ConfigParser()
+config.read(CONFIG_PATH)
+
 plugin_buttons = [MenuButton('Exit', exit_program)]
 
-for filepath in os.listdir('plugins'):
-    filepath = 'plugins/' + filepath
+for filepath in os.listdir(PLUGIN_PATH):
+    filepath = PLUGIN_PATH + filepath
     modname, extension = os.path.splitext(os.path.split(filepath)[-1])
     
     if extension == '.py':
