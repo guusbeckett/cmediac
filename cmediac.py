@@ -26,6 +26,11 @@ class MenuButton(urwid.Button):
         urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(self._w, None, 'selected')
         
+class Menu(urwid.WidgetWrap):
+    def __init__(self, caption, choices):
+        header = urwid.AttrMap(urwid.Text(caption, align='center'), 'heading')
+        self._w = urwid.AttrMap(urwid.ListBox(urwid.SimpleFocusListWalker([header, urwid.Divider()] + choices)), 'options', focus_map)
+        
 class MediaButton(MenuButton):
     def __init__(self, media):
         super(MediaButton, self).__init__(media.title, self.selected)
@@ -41,17 +46,8 @@ class PluginButton(MenuButton):
         
     def selected(self, button):
         media_buttons = [MediaButton(media) for media in self.plugin.get_media()]
-        
-        if len(columns.contents) > 1:
-            del columns.contents[1]
- 
-        columns.contents.append((Menu(self.plugin.name, media_buttons), columns.options('weight', 24)))
+        columns.contents = columns.contents[0:] + [(Menu(self.plugin.name, media_buttons), columns.options('weight', 24))]
         columns.focus_position = 1
-
-class Menu(urwid.WidgetWrap):
-    def __init__(self, caption, choices):
-        header = urwid.AttrMap(urwid.Text(caption, align='center'), 'heading')
-        self._w = urwid.AttrMap(urwid.ListBox(urwid.SimpleFocusListWalker([header, urwid.Divider()] + choices)), 'options', focus_map)
 
 def exit_program(button):
     raise urwid.ExitMainLoop()
