@@ -28,7 +28,7 @@ class Category:
         
 class Plugin:
     def __init__(self, config):
-        self.name = 'YouTube'
+        self.title = 'YouTube'
         self.channels = config.get("youtube", "channels").split(',')
         
     def get_items(self):

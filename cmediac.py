@@ -52,11 +52,11 @@ class ItemButton(MenuButton):
 class PluginButton(MenuButton):
     def __init__(self, plugin):
         self.plugin = plugin
-        super(PluginButton, self).__init__(plugin.name, self.selected)
+        super(PluginButton, self).__init__(plugin.title, self.selected)
         
     def selected(self, button):
         category_buttons = [ItemButton(category) for category in self.plugin.get_items()]
-        columns.contents = columns.contents[:1] + [(Menu(self.plugin.name, category_buttons), columns.options('given', 20))]
+        columns.contents = columns.contents[:1] + [(Menu(self.plugin.title, category_buttons), columns.options('given', 20))]
         columns.focus_position = 1
 
 def exit_program(button):
