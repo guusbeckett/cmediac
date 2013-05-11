@@ -48,16 +48,6 @@ class ItemButton(MenuButton):
             columns.focus_position += 1
         else:
             subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.item.get_url()])
-        
-class PluginButton(MenuButton):
-    def __init__(self, plugin):
-        self.plugin = plugin
-        super(PluginButton, self).__init__(plugin.title, self.selected)
-        
-    def selected(self, button):
-        category_buttons = [ItemButton(category) for category in self.plugin.get_items()]
-        columns.contents = columns.contents[:1] + [(Menu(self.plugin.title, category_buttons), columns.options('given', 20))]
-        columns.focus_position = 1
 
 def exit_program(button):
     raise urwid.ExitMainLoop()
@@ -77,7 +67,7 @@ for path in [path for path in PLUGIN_PATHS if os.path.exists(path)]:
             
             if hasattr(module, 'Plugin'):
                 plugin = module.Plugin(config)
-                plugin_buttons.append(PluginButton(plugin))
+                plugin_buttons.append(ItemButton(plugin))
 
 columns = urwid.Columns([], dividechars=1)
 columns.contents.append((Menu('cmediac', plugin_buttons), columns.options('given', 15)))
