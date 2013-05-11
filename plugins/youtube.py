@@ -36,8 +36,9 @@ class Category:
             return [Media(item[1], item[2]) for item in items]
         
 class Plugin:
-    def __init__(self):
+    def __init__(self, config):
         self.name = 'YouTube'
+        self.channels = config.get("youtube", "channels").split(',')
         
     def get_categories(self):
         categories = []

@@ -80,7 +80,7 @@ for path in [path for path in PLUGIN_PATHS if os.path.exists(path)]:
             module = imp.load_source(modname, filepath)
             
             if hasattr(module, 'Plugin'):
-                plugin = module.Plugin()
+                plugin = module.Plugin(config)
                 plugin_buttons.append(PluginButton(plugin))
 
 columns = urwid.Columns([], dividechars=1)
