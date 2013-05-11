@@ -44,8 +44,8 @@ class ItemButton(MenuButton):
         if hasattr(self.item, 'get_items'):
             buttons = [ItemButton(item) for item in self.item.get_items()]
             categories = [item for item in self.item.get_items() if hasattr(item, 'get_items')]
-            columns.contents = columns.contents[:2] + [(Menu(self.item.title, buttons), columns.options('weight' if len(categories) == 0 else 'given', 20))]
-            columns.focus_position = 2
+            columns.contents = columns.contents[:columns.focus_position+1] + [(Menu(self.item.title, buttons), columns.options('weight' if len(categories) == 0 else 'given', 20))]
+            columns.focus_position += 1
         else:
             subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.item.get_url()])
         
