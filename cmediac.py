@@ -34,24 +34,19 @@ class Menu(urwid.WidgetWrap):
     def __init__(self, caption, choices):
         header = urwid.AttrMap(urwid.Text(caption, align='center'), 'heading')
         self._w = urwid.AttrMap(urwid.ListBox(urwid.SimpleFocusListWalker([header, urwid.Divider()] + choices)), 'options', focus_map)
-        
-class MediaButton(MenuButton):
-    def __init__(self, media):
-        super(MediaButton, self).__init__(media.title, self.selected)
-        self.media = media
-       
-    def selected(self, button):
-        subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.media.get_url()])
 
-class CategoryButton(MenuButton):
-    def __init__(self, category):
-        super(CategoryButton, self).__init__(category.title, self.selected)
-        self.category = category
+class ItemButton(MenuButton):
+    def __init__(self, item):
+        super(ItemButton, self).__init__(item.title, self.selected)
+        self.item = item
        
     def selected(self, button):
-        media_buttons = [MediaButton(media) for media in self.category.get_items()]
-        columns.contents = columns.contents[:2] + [(Menu(self.category.title, media_buttons), columns.options('weight', 24))]
-        columns.focus_position = 2
+        if hasattr(self.item, 'get_items'):
+            media_buttons = [ItemButton(media) for media in self.item.get_items()]
+            columns.contents = columns.contents[:2] + [(Menu(self.item.title, media_buttons), columns.options('weight', 24))]
+            columns.focus_position = 2
+        else:
+            subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.item.get_url()])
         
 class PluginButton(MenuButton):
     def __init__(self, plugin):
@@ -59,7 +54,7 @@ class PluginButton(MenuButton):
         super(PluginButton, self).__init__(plugin.name, self.selected)
         
     def selected(self, button):
-        category_buttons = [CategoryButton(category) for category in self.plugin.get_items()]
+        category_buttons = [ItemButton(category) for category in self.plugin.get_items()]
         columns.contents = columns.contents[:1] + [(Menu(self.plugin.name, category_buttons), columns.options('given', 20))]
         columns.focus_position = 1
 
