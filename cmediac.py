@@ -5,6 +5,7 @@ import os
 import imp
 import subprocess
 import configparser
+import shlex
 
 palette = [
     (None,  'light gray', 'black'),
@@ -29,7 +30,7 @@ class MenuButton(urwid.Button):
         super(MenuButton, self).__init__(text)
         urwid.connect_signal(self, 'click', callback)
         self._w = urwid.AttrMap(self._w, None, 'selected')
-        
+
 class Menu(urwid.WidgetWrap):
     def __init__(self, caption, choices):
         header = urwid.AttrMap(urwid.Text(caption, align='center'), 'heading')
@@ -39,7 +40,7 @@ class ItemButton(MenuButton):
     def __init__(self, item):
         self.item = item
         super(ItemButton, self).__init__(item.title, self.selected)
-       
+
     def selected(self, button):
         if hasattr(self.item, 'get_items'):
             buttons = [ItemButton(item) for item in self.item.get_items()]
@@ -47,7 +48,7 @@ class ItemButton(MenuButton):
             columns.contents = columns.contents[:columns.focus_position+1] + [(Menu(self.item.title, buttons), columns.options('weight' if len(categories) == 0 else 'given', 20))]
             columns.focus_position += 1
         else:
-            subprocess.Popen([config.get('settings', 'player', fallback='omxplayer'), self.item.get_url()])
+            subprocess.Popen(shlex.split(config.get('settings', 'player', fallback='omxplayer')) + [self.item.get_url()])
 
 def exit_program(button):
     raise urwid.ExitMainLoop()
@@ -61,10 +62,10 @@ for path in [path for path in PLUGIN_PATHS if os.path.exists(path)]:
     for filepath in os.listdir(path):
         filepath = path + '/' + filepath
         modname, extension = os.path.splitext(os.path.split(filepath)[-1])
-        
+
         if extension == '.py':
             module = imp.load_source(modname, filepath)
-            
+
             if hasattr(module, 'Plugin'):
                 plugin = module.Plugin(config)
                 plugin_buttons.append(ItemButton(plugin))
