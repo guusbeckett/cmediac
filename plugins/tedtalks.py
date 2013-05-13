@@ -13,5 +13,5 @@ class Plugin:
         self.title = 'TED Talks'
         
     def get_items(self):
-        feed = feedparser.parse('http://feeds.feedburner.com/tedtalks_video')
-        return [Media(talk["title"], talk["links"][1]["href"]) for talk in feed["items"]]
+        feed = feedparser.parse('http://feeds.feedburner.com/TedtalksHD?format=xml')
+        return [Media(talk["title"], talk["media_content"][0]["url"]) for talk in feed["items"]]
